@@ -9,39 +9,56 @@ void change_username_pass(char *new_user, char *new_password);
 
 int main()
 {
-    char name[25], bank[25], pin[25], pass[25], new_pass[25], user_name[25], temp_user_name[25];
-    char input;
-    FILE *fp;
-    printf("Click 1 for Registretion\nClick 0 for Login\nClick E for EXIT\n-> ");
-    scanf("%c", &input);
-    getchar(); // For consiume the '\n'
-    if (input == '1')
-    {
-        printf("\n-> Enter your user name: ");
-        fgets(user_name, 22, stdin);
-        insted(user_name);
-        strcpy(temp_user_name, user_name);
 
-        // Check wheather the user name means file is already exist or not
-        if (fp = fopen(strcat(temp_user_name, ".txt"), "r"))
+    char name[25], bank[25], pin[25], pass[25], new_pass[25], user_name[25], temp_user_name[25];
+    int input;
+    FILE *fp;
+label:
+    printf("Click 1 for Registretion\nClick 2 for Login\nClick 0 for EXIT\n\n-> ");
+    scanf("%d", &input);
+    getchar(); // For consiume the '\n'
+    // printf("\e[1;1H\e[2J");
+    if (input == 1)
+    {
+        while (1)
         {
-            printf("<< User name is already exists >>\n");
-            exit(1);
-        }
-        printf("\n-> Enter your password (Must 5 To 14 Characters): ");
-        fgets(pass, 22, stdin);
-        insted(pass);
-        if (strlen(pass) >= 5 && strlen(pass) <= 14)
-        {
-            registretion(user_name, name, bank, pin, pass);
-        }
-        else
-        {
-            printf("Your password must have 5 to 14 characters.\nYour entered %d characters\n", (int)strlen(pass));
-            exit(1);
+            printf("\n-> Enter your user name: ");
+            fgets(user_name, 22, stdin);
+            insted(user_name);
+            strcpy(temp_user_name, user_name);
+            // Check wheather the user name means file is already exist or not
+            fp = fopen(strcat(temp_user_name, ".txt"), "r");
+            if (fp == NULL)
+            {
+                while (1)
+                {
+                    printf("\n-> Enter your password (Must 5 To 14 Characters): ");
+                    fgets(pass, 22, stdin);
+                    insted(pass);
+                    // printf("%d\n", (int)strlen(pass));
+                    if (strlen(pass) >= 5 && strlen(pass) <= 14)
+                    {
+                        registretion(user_name, name, bank, pin, pass);
+                        goto label;
+                        break;
+                    }
+                    else
+                    {
+                        printf("\nYour password must have 5 to 14 characters.\nYour entered %d characters\n", (int)strlen(pass));
+                        continue;
+                    }
+                }
+                break;
+            }
+            else
+            {
+                printf("\nUser name is already exists \nTry different user name\n");
+                continue;
+            }
         }
     }
-    else if (input == '0')
+
+    else if (input == 2)
     {
         printf("Enter your user name: ");
         fgets(user_name, 22, stdin);
@@ -50,8 +67,9 @@ int main()
         fgets(pass, 22, stdin);
         insted(pass);
         login(user_name, pass);
+        goto label;
     }
-    else if (input == 'E' || input == 'e')
+    else if (input == 0)
     {
         printf("Exit the Program\n");
         exit(0);
@@ -85,7 +103,7 @@ void registretion(char *user_name, char *name, char *bank, char *pin, char *pass
     fprintf(ptr, "(4) User Name: %s\n", user_name);
     fprintf(ptr, "(5) Password: %s\n", pass);
 
-    printf("~~~~ Your File %s has been created ~~~~\n~~~~ Login with your user name & password to access your file ~~~~\n", temp);
+    printf("\n~~~~ Your File %s has been created ~~~~\n~~~~ Login with your user name & password to access your file ~~~~\n\n", temp);
     fclose(ptr);
 }
 
@@ -97,7 +115,8 @@ void login(char *user_name, char *user_password)
     FILE *ptr1 = fopen(strcat(temp_name, ".txt"), "r");
     if (ptr1 == NULL)
     {
-        printf("%s doesn't exsit\nAt first you need to register your self\n", user_name);
+        printf("\n%s user-name doesn't exsit\nAt first you need to register your self\n\n", user_name);
+        return;
     }
     else
     {
@@ -106,66 +125,73 @@ void login(char *user_name, char *user_password)
         if (strcmp(var, user_password) == 0)
         {
             printf("\nFile Accessed\n\n");
-            printf("Click 1 for print the Information\nClick 2 for change the Information\nClick 3 for change User name & Password\nClick 4 for delete your account\nClick 5 for Logout\n-> ");
-            scanf("%d", &x);
-            getchar();
-            switch (x)
+            while (1)
             {
-            case 1:
-                printf("\n Printing the Information \n");
-                printf("--------------------------\n");
-                rewind(ptr1);
-                while (1)
-                {
-                    ch = fgetc(ptr1);
-                    if (ch == EOF)
-                        break;
-                    printf("%c", ch);
-                }
-                break;
-
-            case 5:
-                printf("Successfully Logout\n");
-                exit(0);
-                break;
-
-            case 2:
-                fclose(ptr1);
-                FILE *ptr1 = fopen(temp_name, "w");
-                printf("\n-> Enter your Name: ");
-                fgets(name, 22, stdin);
-                insted(name);
-                printf("\n-> Enter your Bank Account Number: ");
-                fgets(bank, 22, stdin);
-                insted(bank);
-                printf("\n-> Enter your Bank Pin number: ");
-                fgets(pin, 22, stdin);
-                insted(pin);
-                printf("\nInformation Changed\n");
-                fprintf(ptr1, "(1) Name: %s\n", name);
-                fprintf(ptr1, "(2) Bank Account number: %s\n", bank);
-                fprintf(ptr1, "(3) Pin: %s\n", pin);
-                fprintf(ptr1, "(4) User Name: %s\n", user_name);
-                fprintf(ptr1, "(5) Password: %s\n", user_password);
-                break;
-
-            case 3:
-                change_username_pass(user_name, user_password);
-                break;
-
-            case 4:
-                printf("Are your sure to delete your account\nClick y for Yes\nClick n for No\n-> ");
-                scanf("%c", &ch);
+                printf("Click 1 for print the Information\nClick 2 for change the Information\nClick 3 for change User name & Password\nClick 4 for delete your account\nClick 5 for Logout\n\n-> ");
+                scanf("%d", &x);
                 getchar();
-                if (ch == 'y' || ch == 'Y')
+                switch (x)
                 {
-                    remove(temp_name);
-                }
-                break;
+                case 1:
+                    FILE *ptr2 = fopen(temp_name, "r");
+                    printf("\n Printing the Information \n");
+                    printf("--------------------------\n");
+                    rewind(ptr2);
+                    while (1)
+                    {
+                        ch = fgetc(ptr2);
+                        if (ch == EOF)
+                            break;
+                        printf("%c", ch);
+                    }
+                    fclose(ptr2);
+                    printf("\n");
+                    break;
 
-            default:
-                printf("Wrong Input\n");
-                break;
+                case 5:
+                    printf("Successfully Logout\n\n");
+                    fclose(ptr1);
+                    return;
+
+                case 2:
+                    ptr1 = fopen(temp_name, "w");
+                    printf("\n-> Enter your Name: ");
+                    fgets(name, 22, stdin);
+                    insted(name);
+                    printf("\n-> Enter your Bank Account Number: ");
+                    fgets(bank, 22, stdin);
+                    insted(bank);
+                    printf("\n-> Enter your Bank Pin number: ");
+                    fgets(pin, 22, stdin);
+                    insted(pin);
+                    printf("\nInformation Changed\n");
+                    fprintf(ptr1, "(1) Name: %s\n", name);
+                    fprintf(ptr1, "(2) Bank Account number: %s\n", bank);
+                    fprintf(ptr1, "(3) Pin: %s\n", pin);
+                    fprintf(ptr1, "(4) User Name: %s\n", user_name);
+                    fprintf(ptr1, "(5) Password: %s\n", user_password);
+                    fclose(ptr1);
+                    printf("\n");
+                    break;
+
+                case 3:
+                    change_username_pass(user_name, user_password);
+                    break;
+
+                case 4:
+                    printf("Are your sure to delete your account\nClick y for Yes\nClick n for No\n-> ");
+                    scanf("%c", &ch);
+                    getchar();
+                    if (ch == 'y' || ch == 'Y')
+                    {
+                        remove(temp_name);
+                    }
+                    break;
+
+                default:
+                    printf("Wrong Input\n");
+                    break;
+                }
             }
         }
         else if (strcmp(var, user_password) != 0)
