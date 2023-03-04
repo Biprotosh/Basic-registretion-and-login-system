@@ -184,9 +184,10 @@ void login(char *user_name, char *user_password)
                     getchar();
                     if (ch == 'y' || ch == 'Y')
                     {
+                        fclose(ptr1);
                         remove(temp_name);
                     }
-                    break;
+                    return;
 
                 default:
                     printf("Wrong Input\n");
